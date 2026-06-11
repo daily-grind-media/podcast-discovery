@@ -475,16 +475,7 @@
         <p>Please complete this questionnaire prior to your podcast session. The more context and detail you provide, the more strategic and productive we can make your recording session. This information will help shape content pillars, talking points, episode structure, reel opportunities, and future content strategy.</p>
       </header>
 
-      <!-- ================================================================
-           FORM
-           ================================================================
-           HOW TO SET UP EMAIL DELIVERY:
-           1. Go to https://formspree.io and create a free account.
-           2. Create a new form and set the email to: team@dailygrindmediapro.com
-           3. Copy your unique Formspree endpoint — it looks like:
-              https://formspree.io/f/XXXXXXXX
-           4. Replace "YOUR_FORMSPREE_ENDPOINT" in the action attribute below.
-           ================================================================ -->
+
       <form
         id="intake-form"
         action="https://formspree.io/f/mnjygpgr"
@@ -784,7 +775,7 @@
   </div>
 
   <script>
-    // ── Scroll reveal ──────────────────────────────────────────
+    // Scroll reveal
     document.querySelectorAll('.form-section').forEach(function(sec) {
       new IntersectionObserver(function(entries, obs) {
         entries.forEach(function(entry) {
@@ -796,65 +787,59 @@
       }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }).observe(sec);
     });
 
-    // ── Reading progress bar ───────────────────────────────────
-    var progressBar = document.getElementById('progress-bar');
-    window.addEventListener('scroll', function() {
-      var scrollTop = window.scrollY;
-      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
-    }, { passive: true });
+    // Progress bar
+    var bar = document.getElementById('progress-bar');
+    if (bar) {
+      window.addEventListener('scroll', function() {
+        var h = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + '%';
+      }, { passive: true });
+    }
 
-    // ── Form submission ────────────────────────────────────────
-    // Uses plain XMLHttpRequest — avoids any async/await or
-    // fetch issues that can silently throw and let the native
-    // form action fire (which causes scroll-to-top behaviour).
-    var intakeForm    = document.getElementById('intake-form');
-    var formWrapper   = document.getElementById('intake-form-wrapper');
-    var thankYouPage  = document.getElementById('thank-you');
-    var submitBtn     = document.querySelector('.submit-btn');
-    var submitLabel   = submitBtn ? submitBtn.querySelector('span') : null;
+    // Form submission
+    var form = document.getElementById('intake-form');
+    var wrapper = document.getElementById('intake-form-wrapper');
+    var ty = document.getElementById('thank-you');
 
-    intakeForm.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e) {
       e.preventDefault();
-      e.stopPropagation();
 
-      if (submitLabel) submitLabel.textContent = 'Sending…';
-      if (submitBtn)   submitBtn.disabled = true;
+      var btn = form.querySelector('button[type="submit"]');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
 
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://formspree.io/f/mnjygpgr');
-      xhr.setRequestHeader('Accept', 'application/json');
+      var data = new FormData(form);
 
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState !== XMLHttpRequest.DONE) return;
-
-        if (xhr.status >= 200 && xhr.status < 300) {
-          // Success — show thank-you, hide form
-          formWrapper.style.display = 'none';
-          thankYouPage.style.display = 'flex';
+      fetch('https://formspree.io/f/mnjygpgr', {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(function(res) {
+        return res.json().then(function(json) {
+          return { ok: res.ok, json: json };
+        });
+      })
+      .then(function(result) {
+        if (result.ok) {
+          wrapper.style.display = 'none';
+          ty.style.display = 'flex';
           window.scrollTo(0, 0);
         } else {
-          // Error — show message, re-enable button
-          var msg = 'Submission failed. Please try again or email team@dailygrindmediapro.com directly.';
-          try {
-            var json = JSON.parse(xhr.responseText);
-            if (json.errors && json.errors.length) {
-              msg = json.errors.map(function(err) { return err.message; }).join(', ');
-            }
-          } catch(ignore) {}
-          alert(msg);
-          if (submitLabel) submitLabel.textContent = 'Submit Questionnaire';
-          if (submitBtn)   submitBtn.disabled = false;
+          var msg = 'Submission failed.';
+          if (result.json && result.json.errors) {
+            msg = result.json.errors.map(function(e) { return e.message; }).join(', ');
+          }
+          alert(msg + ' Please try again or email team@dailygrindmediapro.com');
+          btn.innerHTML = '<span>Submit Questionnaire</span><span class="btn-arrow">→</span>';
+          btn.disabled = false;
         }
-      };
-
-      xhr.onerror = function() {
-        alert('A network error occurred. Please check your connection and try again.');
-        if (submitLabel) submitLabel.textContent = 'Submit Questionnaire';
-        if (submitBtn)   submitBtn.disabled = false;
-      };
-
-      xhr.send(new FormData(intakeForm));
+      })
+      .catch(function() {
+        alert('Network error. Please check your connection and try again.');
+        btn.innerHTML = '<span>Submit Questionnaire</span><span class="btn-arrow">→</span>';
+        btn.disabled = false;
+      });
     });
   </script>
 </body>
