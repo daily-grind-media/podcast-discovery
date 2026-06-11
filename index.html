@@ -491,6 +491,7 @@
         method="POST"
 
       >
+        <input type="hidden" name="_subject" value="New Podcast Discovery Questionnaire — Daily Grind Media" />
 
         <!-- Section 1: Business Foundation -->
         <section class="form-section" data-section="1">
@@ -508,6 +509,11 @@
               <label for="business-name">Business Name</label>
               <input type="text" id="business-name" name="business_name" placeholder="Your business name" />
             </div>
+          </div>
+
+          <div class="field-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="your@email.com" required />
           </div>
 
           <div class="field-row">
@@ -778,75 +784,77 @@
   </div>
 
   <script>
-    /* =====================================================
-       SCROLL REVEAL — sections animate in as user scrolls
-       ===================================================== */
-    const sections = document.querySelectorAll('.form-section');
+    // ── Scroll reveal ──────────────────────────────────────────
+    document.querySelectorAll('.form-section').forEach(function(sec) {
+      new IntersectionObserver(function(entries, obs) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }).observe(sec);
+    });
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-
-    sections.forEach(s => observer.observe(s));
-
-    /* =====================================================
-       READING PROGRESS BAR
-       ===================================================== */
-    const progressBar = document.getElementById('progress-bar');
-
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      progressBar.style.width = pct + '%';
+    // ── Reading progress bar ───────────────────────────────────
+    var progressBar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', function() {
+      var scrollTop = window.scrollY;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
     }, { passive: true });
 
-    /* =====================================================
-       FORM SUBMISSION — Formspree AJAX
-       Endpoint: https://formspree.io/f/mnjygpgr
-       Do NOT set Content-Type manually — the browser sets
-       the correct multipart boundary for FormData automatically.
-       ===================================================== */
-    const form = document.getElementById('intake-form');
-    const formWrapper = document.getElementById('intake-form-wrapper');
-    const thankYou = document.getElementById('thank-you');
+    // ── Form submission ────────────────────────────────────────
+    // Uses plain XMLHttpRequest — avoids any async/await or
+    // fetch issues that can silently throw and let the native
+    // form action fire (which causes scroll-to-top behaviour).
+    var intakeForm    = document.getElementById('intake-form');
+    var formWrapper   = document.getElementById('intake-form-wrapper');
+    var thankYouPage  = document.getElementById('thank-you');
+    var submitBtn     = document.querySelector('.submit-btn');
+    var submitLabel   = submitBtn ? submitBtn.querySelector('span') : null;
 
-    form.addEventListener('submit', async (e) => {
+    intakeForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      e.stopPropagation();
 
-      const btn = form.querySelector('.submit-btn');
-      const btnLabel = btn.querySelector('span:first-child');
-      btnLabel.textContent = 'Sending…';
-      btn.disabled = true;
+      if (submitLabel) submitLabel.textContent = 'Sending…';
+      if (submitBtn)   submitBtn.disabled = true;
 
-      try {
-        const res = await fetch('https://formspree.io/f/mnjygpgr', {
-          method: 'POST',
-          body: new FormData(form),
-          headers: { 'Accept': 'application/json' }
-        });
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://formspree.io/f/mnjygpgr');
+      xhr.setRequestHeader('Accept', 'application/json');
 
-        if (res.ok) {
-          formWrapper.classList.add('hidden');
-          thankYou.classList.add('show');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState !== XMLHttpRequest.DONE) return;
+
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Success — show thank-you, hide form
+          formWrapper.style.display = 'none';
+          thankYouPage.style.display = 'flex';
+          window.scrollTo(0, 0);
         } else {
-          const json = await res.json().catch(() => ({}));
-          const msg = (json.errors && json.errors.map(err => err.message).join(', '))
-            || 'Something went wrong. Please try again or email team@dailygrindmediapro.com directly.';
+          // Error — show message, re-enable button
+          var msg = 'Submission failed. Please try again or email team@dailygrindmediapro.com directly.';
+          try {
+            var json = JSON.parse(xhr.responseText);
+            if (json.errors && json.errors.length) {
+              msg = json.errors.map(function(err) { return err.message; }).join(', ');
+            }
+          } catch(ignore) {}
           alert(msg);
-          btnLabel.textContent = 'Submit Questionnaire';
-          btn.disabled = false;
+          if (submitLabel) submitLabel.textContent = 'Submit Questionnaire';
+          if (submitBtn)   submitBtn.disabled = false;
         }
-      } catch (err) {
+      };
+
+      xhr.onerror = function() {
         alert('A network error occurred. Please check your connection and try again.');
-        btnLabel.textContent = 'Submit Questionnaire';
-        btn.disabled = false;
-      }
+        if (submitLabel) submitLabel.textContent = 'Submit Questionnaire';
+        if (submitBtn)   submitBtn.disabled = false;
+      };
+
+      xhr.send(new FormData(intakeForm));
     });
   </script>
 </body>
