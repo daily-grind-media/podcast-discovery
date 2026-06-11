@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Podcast Discovery Questionnaire — Daily Grind Media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =====================================================
+       DESIGN TOKENS
+       ===================================================== */
+    :root {
+      --black:        #0A0A0A;
+      --off-black:    #111111;
+      --surface:      #161616;
+      --border:       #242424;
+      --copper:       #BB725A;
+      --copper-light: #D08B72;
+      --copper-dark:  #8F5341;
+      --white:        #FFFFFF;
+      --off-white:    #E8E4DF;
+      --muted:        #7A7672;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body:    'Inter', sans-serif;
+      --transition:   0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* =====================================================
+       RESET & BASE
+       ===================================================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* =====================================================
+       AMBIENT TEXTURE — signature element
+       A slow-burning copper grain overlay gives the page
+       a tactile, printed-material quality without competing
+       with content. Reduced motion disables it gracefully.
+       ===================================================== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(187,114,90,0.07) 0%, transparent 70%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =====================================================
+       LAYOUT
+       ===================================================== */
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* =====================================================
+       HEADER
+       ===================================================== */
+    .site-header {
+      padding: 64px 0 56px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 64px;
+    }
+
+    .logo-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .logo-rule::before,
+    .logo-rule::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--copper));
+    }
+    .logo-rule::after {
+      background: linear-gradient(to left, transparent, var(--copper));
+    }
+
+    .logo-diamond {
+      width: 8px;
+      height: 8px;
+      background: var(--copper);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    .site-header h1 {
+      font-family: var(--font-body);
+      font-size: clamp(11px, 2.5vw, 13px);
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 16px;
+    }
+
+    .site-header h2 {
+      font-family: var(--font-body);
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      line-height: 1.4;
+      color: var(--white);
+      margin-bottom: 28px;
+    }
+
+    .site-header h2 em {
+      font-style: normal;
+      color: var(--off-white);
+    }
+
+    .site-header p {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      max-width: 540px;
+      margin: 0 auto;
+      line-height: 1.9;
+    }
+
+    /* =====================================================
+       PROGRESS INDICATOR
+       ===================================================== */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: linear-gradient(to right, var(--copper-dark), var(--copper-light));
+      z-index: 100;
+      transition: width 0.2s ease;
+    }
+
+    /* =====================================================
+       SECTIONS
+       ===================================================== */
+    .form-section {
+      margin-bottom: 64px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .form-section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--copper);
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-family: var(--font-body);
+      font-size: clamp(13px, 2.5vw, 15px);
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    /* =====================================================
+       FORM FIELDS
+       ===================================================== */
+    .field-group {
+      margin-bottom: 28px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 10px;
+    }
+
+    .field-group input,
+    .field-group textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.6;
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .field-group input::placeholder,
+    .field-group textarea::placeholder {
+      color: #3A3633;
+    }
+
+    .field-group input:focus,
+    .field-group textarea:focus {
+      border-color: var(--copper);
+      background: var(--off-black);
+      box-shadow: 0 0 0 1px var(--copper-dark);
+    }
+
+    .field-group textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .field-group textarea.tall {
+      min-height: 150px;
+    }
+
+    /* Two-column layout for short fields */
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =====================================================
+       SUBMIT BUTTON
+       ===================================================== */
+    .submit-wrap {
+      padding-top: 16px;
+      text-align: center;
+    }
+
+    .submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: transparent;
+      border: 1px solid var(--copper);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 18px 48px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color var(--transition);
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--copper);
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .submit-btn:hover::before,
+    .submit-btn:focus-visible::before {
+      transform: translateX(0);
+    }
+
+    .submit-btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .submit-btn .btn-arrow {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      transition: transform var(--transition);
+    }
+
+    .submit-btn:hover .btn-arrow {
+      transform: translateX(4px);
+    }
+
+    .submit-note {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* =====================================================
+       THANK YOU PAGE
+       ===================================================== */
+    #thank-you {
+      display: none;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px;
+    }
+
+    #thank-you.show {
+      display: flex;
+    }
+
+    .thank-you-inner {
+      max-width: 560px;
+    }
+
+    .ty-ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .ty-ornament .line {
+      width: 60px;
+      height: 1px;
+      background: var(--copper);
+    }
+
+    .ty-ornament .diamond {
+      width: 10px;
+      height: 10px;
+      background: var(--copper);
+      transform: rotate(45deg);
+    }
+
+    #thank-you h2 {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 8vw, 72px);
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    #thank-you .brand-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--copper);
+      margin-bottom: 36px;
+      display: block;
+    }
+
+    #thank-you p {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 18px;
+    }
+
+    #thank-you .ty-divider {
+      width: 1px;
+      height: 60px;
+      background: linear-gradient(to bottom, var(--copper), transparent);
+      margin: 40px auto 0;
+    }
+
+    /* =====================================================
+       FORM (visible/hidden)
+       ===================================================== */
+    #intake-form-wrapper.hidden {
+      display: none;
+    }
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+    .site-footer {
+      text-align: center;
+      padding: 48px 0 0;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+    }
+
+    .site-footer p {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* =====================================================
+       REDUCED MOTION
+       ===================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      .form-section {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+      body::before { display: none; }
+      .progress-bar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Progress bar -->
+  <div class="progress-bar" id="progress-bar"></div>
+
+  <!-- =====================================================
+       MAIN FORM WRAPPER
+       ===================================================== -->
+  <div id="intake-form-wrapper">
+    <div class="page-wrapper">
+
+      <!-- Header -->
+      <header class="site-header">
+        <div class="logo-rule"><div class="logo-diamond"></div></div>
+        <h1>Daily Grind Media</h1>
+        <h2>Podcast Discovery<br><em>Questionnaire</em></h2>
+        <p>Please complete this questionnaire prior to your podcast session. The more context and detail you provide, the more strategic and productive we can make your recording session. This information will help shape content pillars, talking points, episode structure, reel opportunities, and future content strategy.</p>
+      </header>
+
+      <!-- ================================================================
+           FORM
+           ================================================================
+           HOW TO SET UP EMAIL DELIVERY:
+           1. Go to https://formspree.io and create a free account.
+           2. Create a new form and set the email to: team@dailygrindmediapro.com
+           3. Copy your unique Formspree endpoint — it looks like:
+              https://formspree.io/f/XXXXXXXX
+           4. Replace "YOUR_FORMSPREE_ENDPOINT" in the action attribute below.
+           ================================================================ -->
+      <form
+        id="intake-form"
+        action="YOUR_FORMSPREE_ENDPOINT"
+        method="POST"
+        novalidate
+      >
+
+        <!-- Section 1: Business Foundation -->
+        <section class="form-section" data-section="1">
+          <div class="section-header">
+            <span class="section-label">01</span>
+            <h3 class="section-title">Business Foundation</h3>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label for="full-name">Full Name</label>
+              <input type="text" id="full-name" name="full_name" placeholder="Your full name" required />
+            </div>
+            <div class="field-group">
+              <label for="business-name">Business Name</label>
+              <input type="text" id="business-name" name="business_name" placeholder="Your business name" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label for="website">Website</label>
+              <input type="url" id="website" name="website" placeholder="https://" />
+            </div>
+            <div class="field-group">
+              <label for="instagram">Instagram Handle</label>
+              <input type="text" id="instagram" name="instagram" placeholder="@handle" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="services">What services do you offer?</label>
+            <textarea id="services" name="services" placeholder="Describe your offerings — training formats, programs, coaching models…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="ideal-client">Who is your ideal client?</label>
+            <textarea id="ideal-client" name="ideal_client" placeholder="Be specific — demographics, mindset, goals, where they are in their journey…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="not-ideal-client">Who is NOT your ideal client?</label>
+            <textarea id="not-ideal-client" name="not_ideal_client" placeholder="This helps define your positioning and messaging clearly…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="problems-solved">What problems do you solve?</label>
+            <textarea id="problems-solved" name="problems_solved" placeholder="The core challenges your clients come to you with…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="transformation">What transformation do your clients achieve?</label>
+            <textarea id="transformation" name="transformation" placeholder="Describe the outcome — physical, mental, lifestyle…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="differentiator">What makes you different from other trainers?</label>
+            <textarea id="differentiator" name="differentiator" placeholder="Your unique approach, method, or perspective…"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 2: Your Story -->
+        <section class="form-section" data-section="2">
+          <div class="section-header">
+            <span class="section-label">02</span>
+            <h3 class="section-title">Your Story</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="into-fitness">How did you get into fitness?</label>
+            <textarea id="into-fitness" name="into_fitness" placeholder="Your origin story…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="inspired-coaching">What inspired you to become a coach?</label>
+            <textarea id="inspired-coaching" name="inspired_coaching" placeholder="The moment or journey that led you to coaching…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="challenges-overcome">What challenges have you overcome?</label>
+            <textarea id="challenges-overcome" name="challenges_overcome" placeholder="Personal or professional — anything that shaped who you are today…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="lessons-shaped">What lessons have shaped your coaching philosophy?</label>
+            <textarea id="lessons-shaped" name="lessons_shaped" placeholder="Key moments that changed how you think about fitness and coaching…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="personal-connections">What personal experiences connect most with clients?</label>
+            <textarea id="personal-connections" name="personal_connections" placeholder="Stories clients relate to or that create trust…"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 3: Coaching Philosophy -->
+        <section class="form-section" data-section="3">
+          <div class="section-header">
+            <span class="section-label">03</span>
+            <h3 class="section-title">Coaching Philosophy</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="disagree-advice">What fitness advice do you strongly disagree with?</label>
+            <textarea id="disagree-advice" name="disagree_advice" placeholder="Conventional wisdom you push back on…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="client-mistakes">What mistakes do most clients make?</label>
+            <textarea id="client-mistakes" name="client_mistakes" placeholder="The patterns you see repeatedly…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="trainer-mistakes">What do most trainers get wrong?</label>
+            <textarea id="trainer-mistakes" name="trainer_mistakes" placeholder="Industry-wide gaps or missteps from your perspective…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="guiding-beliefs">What beliefs guide your coaching approach?</label>
+            <textarea id="guiding-beliefs" name="guiding_beliefs" placeholder="The principles you coach from…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="one-lesson">If every client learned one lesson from you, what would it be?</label>
+            <textarea id="one-lesson" name="one_lesson" placeholder="Your single most important teaching…"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 4: Client Success Stories -->
+        <section class="form-section" data-section="4">
+          <div class="section-header">
+            <span class="section-label">04</span>
+            <h3 class="section-title">Client Success Stories</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="best-transformation">Describe your best client transformation.</label>
+            <textarea class="tall" id="best-transformation" name="best_transformation" placeholder="Share the journey — where they started, what shifted, where they ended up…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="standout-challenge">Describe a client challenge that stands out.</label>
+            <textarea id="standout-challenge" name="standout_challenge" placeholder="A difficult case and how you navigated it…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="success-habits">What habits do successful clients have in common?</label>
+            <textarea id="success-habits" name="success_habits" placeholder="The patterns that predict results…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="struggle-habits">What habits cause clients to struggle?</label>
+            <textarea id="struggle-habits" name="struggle_habits" placeholder="Behaviors that hold people back…"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 5: Expertise & Content -->
+        <section class="form-section" data-section="5">
+          <div class="section-header">
+            <span class="section-label">05</span>
+            <h3 class="section-title">Expertise &amp; Content</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="common-questions">What questions do clients ask you most often?</label>
+            <textarea id="common-questions" name="common_questions" placeholder="The FAQs that come up in every consultation…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="hour-topics">What topics could you speak about for an hour without preparation?</label>
+            <textarea id="hour-topics" name="hour_topics" placeholder="Your zones of deep expertise and passion…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="myths">What myths do you frequently debunk?</label>
+            <textarea id="myths" name="myths" placeholder="Misconceptions you correct regularly…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="passionate-topics">What topics are you most passionate about teaching?</label>
+            <textarea id="passionate-topics" name="passionate_topics" placeholder="Where you feel most alive as an educator…"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 6: Personal Brand -->
+        <section class="form-section" data-section="6">
+          <div class="section-header">
+            <span class="section-label">06</span>
+            <h3 class="section-title">Personal Brand</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="known-for">What do you want to be known for?</label>
+            <textarea id="known-for" name="known_for" placeholder="Your reputation — what you want people to say about you…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="core-values">What values matter most to you?</label>
+            <textarea id="core-values" name="core_values" placeholder="The principles you build your brand around…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="motivation">What motivates you?</label>
+            <textarea id="motivation" name="motivation" placeholder="What drives you to keep going…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="success-definition">What does success mean to you?</label>
+            <textarea id="success-definition" name="success_definition" placeholder="How you define it — beyond revenue…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="five-year">Where do you want your business to be in 5 years?</label>
+            <textarea id="five-year" name="five_year" placeholder="Vision, scale, impact…"></textarea>
+          </div>
+        </section>
+
+        <!-- Section 7: Podcast Planning -->
+        <section class="form-section" data-section="7">
+          <div class="section-header">
+            <span class="section-label">07</span>
+            <h3 class="section-title">Podcast Planning</h3>
+          </div>
+
+          <div class="field-group">
+            <label for="podcast-topics">What topics would you like to discuss?</label>
+            <textarea id="podcast-topics" name="podcast_topics" placeholder="Themes, angles, or conversations you want to have on air…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="stories-to-share">Are there specific stories you want to share?</label>
+            <textarea id="stories-to-share" name="stories_to_share" placeholder="Moments, case studies, or narratives you want to tell…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="offers-to-highlight">Are there specific offers or services you want to highlight?</label>
+            <textarea id="offers-to-highlight" name="offers_to_highlight" placeholder="Current programs, launches, or services to feature…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="business-goals">What are your current business goals?</label>
+            <textarea id="business-goals" name="business_goals" placeholder="What you're working toward right now — client growth, brand awareness, launches…"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label for="anything-else">Anything else you'd like covered?</label>
+            <textarea id="anything-else" name="anything_else" placeholder="Open space — add anything that would help us prepare for your session…"></textarea>
+          </div>
+        </section>
+
+        <!-- Submit -->
+        <div class="form-section submit-wrap" data-section="submit">
+          <button type="submit" class="submit-btn">
+            <span>Submit Questionnaire</span>
+            <span class="btn-arrow">→</span>
+          </button>
+          <p class="submit-note">Your responses will be sent securely to the Daily Grind Media team.</p>
+        </div>
+
+      </form>
+
+      <footer class="site-footer">
+        <p>Daily Grind Media &nbsp;·&nbsp; Confidential</p>
+      </footer>
+
+    </div><!-- /page-wrapper -->
+  </div><!-- /intake-form-wrapper -->
+
+  <!-- =====================================================
+       THANK YOU PAGE
+       ===================================================== -->
+  <div id="thank-you" role="main" aria-live="polite">
+    <div class="thank-you-inner">
+      <div class="ty-ornament">
+        <div class="line"></div>
+        <div class="diamond"></div>
+        <div class="line"></div>
+      </div>
+      <h2>Thank You</h2>
+      <span class="brand-tag">Daily Grind Media</span>
+      <p>Your discovery questionnaire has been submitted successfully.</p>
+      <p>We'll review your responses and use them to structure your podcast session, content strategy, and talking points so we can maximize the value of your recording day.</p>
+      <p>We'll be in touch if any additional information is needed prior to your session.</p>
+      <div class="ty-divider"></div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       SCROLL REVEAL — sections animate in as user scrolls
+       ===================================================== */
+    const sections = document.querySelectorAll('.form-section');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    sections.forEach(s => observer.observe(s));
+
+    /* =====================================================
+       READING PROGRESS BAR
+       ===================================================== */
+    const progressBar = document.getElementById('progress-bar');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    }, { passive: true });
+
+    /* =====================================================
+       FORM SUBMISSION via Formspree (AJAX)
+
+       Formspree setup reminder:
+       1. Register at https://formspree.io
+       2. Create form → set email to team@dailygrindmediapro.com
+       3. Replace "YOUR_FORMSPREE_ENDPOINT" in the <form> action attribute above
+          with your Formspree URL, e.g. https://formspree.io/f/abcd1234
+       ===================================================== */
+    const form = document.getElementById('intake-form');
+    const formWrapper = document.getElementById('intake-form-wrapper');
+    const thankYou = document.getElementById('thank-you');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const btn = form.querySelector('.submit-btn');
+      btn.querySelector('span:first-child').textContent = 'Sending…';
+      btn.disabled = true;
+
+      const data = new FormData(form);
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (res.ok) {
+          // Show thank you page
+          formWrapper.classList.add('hidden');
+          thankYou.classList.add('show');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const json = await res.json().catch(() => ({}));
+          const msg = (json.errors && json.errors.map(e => e.message).join(', '))
+            || 'There was an issue submitting the form. Please try again or email us directly at team@dailygrindmediapro.com';
+          alert(msg);
+          btn.querySelector('span:first-child').textContent = 'Submit Questionnaire';
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('A network error occurred. Please check your connection and try again.');
+        btn.querySelector('span:first-child').textContent = 'Submit Questionnaire';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
