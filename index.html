@@ -487,9 +487,9 @@
            ================================================================ -->
       <form
         id="intake-form"
-        action="YOUR_FORMSPREE_ENDPOINT"
+        action="https://formspree.io/f/mnjygpgr"
         method="POST"
-        novalidate
+
       >
 
         <!-- Section 1: Business Foundation -->
@@ -806,13 +806,10 @@
     }, { passive: true });
 
     /* =====================================================
-       FORM SUBMISSION via Formspree (AJAX)
-
-       Formspree setup reminder:
-       1. Register at https://formspree.io
-       2. Create form → set email to team@dailygrindmediapro.com
-       3. Replace "YOUR_FORMSPREE_ENDPOINT" in the <form> action attribute above
-          with your Formspree URL, e.g. https://formspree.io/f/abcd1234
+       FORM SUBMISSION — Formspree AJAX
+       Endpoint: https://formspree.io/f/mnjygpgr
+       Do NOT set Content-Type manually — the browser sets
+       the correct multipart boundary for FormData automatically.
        ===================================================== */
     const form = document.getElementById('intake-form');
     const formWrapper = document.getElementById('intake-form-wrapper');
@@ -822,34 +819,32 @@
       e.preventDefault();
 
       const btn = form.querySelector('.submit-btn');
-      btn.querySelector('span:first-child').textContent = 'Sending…';
+      const btnLabel = btn.querySelector('span:first-child');
+      btnLabel.textContent = 'Sending…';
       btn.disabled = true;
 
-      const data = new FormData(form);
-
       try {
-        const res = await fetch(form.action, {
+        const res = await fetch('https://formspree.io/f/mnjygpgr', {
           method: 'POST',
-          body: data,
+          body: new FormData(form),
           headers: { 'Accept': 'application/json' }
         });
 
         if (res.ok) {
-          // Show thank you page
           formWrapper.classList.add('hidden');
           thankYou.classList.add('show');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
           const json = await res.json().catch(() => ({}));
-          const msg = (json.errors && json.errors.map(e => e.message).join(', '))
-            || 'There was an issue submitting the form. Please try again or email us directly at team@dailygrindmediapro.com';
+          const msg = (json.errors && json.errors.map(err => err.message).join(', '))
+            || 'Something went wrong. Please try again or email team@dailygrindmediapro.com directly.';
           alert(msg);
-          btn.querySelector('span:first-child').textContent = 'Submit Questionnaire';
+          btnLabel.textContent = 'Submit Questionnaire';
           btn.disabled = false;
         }
       } catch (err) {
         alert('A network error occurred. Please check your connection and try again.');
-        btn.querySelector('span:first-child').textContent = 'Submit Questionnaire';
+        btnLabel.textContent = 'Submit Questionnaire';
         btn.disabled = false;
       }
     });
