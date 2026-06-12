@@ -1,590 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Podcast Discovery Questionnaire — Daily Grind Media</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --black:        #0A0A0A;
-      --off-black:    #111111;
-      --surface:      #161616;
-      --border:       #242424;
-      --copper:       #BB725A;
-      --copper-light: #D08B72;
-      --copper-dark:  #8F5341;
-      --white:        #FFFFFF;
-      --off-white:    #E8E4DF;
-      --muted:        #7A7672;
-      --font-body:    'Inter', sans-serif;
-      --transition:   0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podcast Discovery Questionnaire — Daily Grind Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{background:#0A0A0A;color:#fff;font-family:'Inter',sans-serif;font-weight:300;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px 80px}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* header */
+.hdr{padding:64px 0 56px;text-align:center;border-bottom:1px solid #242424;margin-bottom:64px}
+.rule{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}
+.rule::before,.rule::after{content:'';flex:1;max-width:80px;height:1px}
+.rule::before{background:linear-gradient(to right,transparent,#BB725A)}
+.rule::after{background:linear-gradient(to left,transparent,#BB725A)}
+.diamond{width:8px;height:8px;background:#BB725A;transform:rotate(45deg)}
+.brand{font-size:12px;font-weight:600;letter-spacing:.35em;text-transform:uppercase;color:#BB725A;margin-bottom:16px}
+.hdr h1{font-size:clamp(20px,4vw,30px);font-weight:300;letter-spacing:.25em;text-transform:uppercase;color:#fff;margin-bottom:24px}
+.hdr p{font-size:13px;color:#7A7672;max-width:540px;margin:0 auto;line-height:1.9;letter-spacing:.03em}
 
-    html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+/* sections */
+.sec{margin-bottom:64px}
+.sec-hdr{display:flex;align-items:baseline;gap:16px;margin-bottom:40px;padding-bottom:20px;border-bottom:1px solid #242424}
+.sec-num{font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:#BB725A;white-space:nowrap}
+.sec-ttl{font-size:13px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:#fff}
 
-    body {
-      background-color: var(--black);
-      color: var(--white);
-      font-family: var(--font-body);
-      font-weight: 300;
-      line-height: 1.7;
-      min-height: 100vh;
-    }
+/* fields */
+.fg{margin-bottom:28px}
+.fg label{display:block;font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:#BB725A;margin-bottom:10px}
+.fg input,.fg textarea{
+  width:100%;background:#161616;border:1px solid #242424;border-radius:0;
+  color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:300;
+  line-height:1.6;padding:14px 18px;outline:none;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color .3s,background .3s,box-shadow .3s
+}
+.fg input::placeholder,.fg textarea::placeholder{color:#3A3633}
+.fg input:focus,.fg textarea:focus{border-color:#BB725A;background:#111;box-shadow:0 0 0 1px #8F5341}
+.fg textarea{min-height:110px;resize:vertical}
+.fg textarea.tall{min-height:150px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(187,114,90,0.07) 0%, transparent 70%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
+/* submit */
+.sub{padding-top:16px;text-align:center}
+button[type=submit]{
+  background:transparent;border:1px solid #BB725A;color:#fff;
+  font-family:'Inter',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.3em;text-transform:uppercase;padding:18px 48px;
+  cursor:pointer;position:relative;overflow:hidden;display:inline-block
+}
+button[type=submit]::before{
+  content:'';position:absolute;inset:0;background:#BB725A;
+  transform:translateX(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);z-index:0
+}
+button[type=submit]:hover::before{transform:translateX(0)}
+button[type=submit] span{position:relative;z-index:1}
+.sub-note{margin-top:16px;font-size:12px;color:#7A7672;letter-spacing:.05em}
 
-    .page-wrapper {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
-
-    /* ── Header ── */
-    .site-header {
-      padding: 64px 0 56px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 64px;
-    }
-
-    .logo-rule {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .logo-rule::before,
-    .logo-rule::after {
-      content: '';
-      flex: 1;
-      max-width: 80px;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--copper));
-    }
-    .logo-rule::after {
-      background: linear-gradient(to left, transparent, var(--copper));
-    }
-    .logo-diamond {
-      width: 8px;
-      height: 8px;
-      background: var(--copper);
-      transform: rotate(45deg);
-      flex-shrink: 0;
-    }
-
-    .site-header h1 {
-      font-family: var(--font-body);
-      font-size: clamp(11px, 2.5vw, 13px);
-      font-weight: 600;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--copper);
-      margin-bottom: 16px;
-    }
-
-    .site-header h2 {
-      font-family: var(--font-body);
-      font-size: clamp(22px, 4vw, 32px);
-      font-weight: 300;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      line-height: 1.4;
-      color: var(--white);
-      margin-bottom: 28px;
-    }
-
-    .site-header p {
-      font-size: 13px;
-      font-weight: 300;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      max-width: 540px;
-      margin: 0 auto;
-      line-height: 1.9;
-    }
-
-    /* ── Sections ── */
-    .form-section {
-      margin-bottom: 64px;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: baseline;
-      gap: 16px;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .section-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--copper);
-      white-space: nowrap;
-    }
-
-    .section-title {
-      font-family: var(--font-body);
-      font-size: clamp(13px, 2.5vw, 15px);
-      font-weight: 500;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--white);
-    }
-
-    /* ── Fields ── */
-    .field-group {
-      margin-bottom: 28px;
-    }
-
-    .field-group label {
-      display: block;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--copper);
-      margin-bottom: 10px;
-    }
-
-    .field-group input,
-    .field-group textarea {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 0;
-      color: var(--white);
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 300;
-      line-height: 1.6;
-      padding: 14px 18px;
-      outline: none;
-      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .field-group input::placeholder,
-    .field-group textarea::placeholder {
-      color: #3A3633;
-    }
-
-    .field-group input:focus,
-    .field-group textarea:focus {
-      border-color: var(--copper);
-      background: var(--off-black);
-      box-shadow: 0 0 0 1px var(--copper-dark);
-    }
-
-    .field-group textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-
-    .field-group textarea.tall {
-      min-height: 150px;
-    }
-
-    .field-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 560px) {
-      .field-row { grid-template-columns: 1fr; }
-    }
-
-    /* ── Submit ── */
-    .submit-wrap {
-      padding-top: 16px;
-      text-align: center;
-    }
-
-    button[type="submit"] {
-      display: inline-block;
-      background: transparent;
-      border: 1px solid var(--copper);
-      color: var(--white);
-      font-family: var(--font-body);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      padding: 18px 48px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-      transition: color var(--transition);
-    }
-
-    button[type="submit"]::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--copper);
-      transform: translateX(-100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    button[type="submit"]:hover::before,
-    button[type="submit"]:focus-visible::before {
-      transform: translateX(0);
-    }
-
-    button[type="submit"] span {
-      position: relative;
-      z-index: 1;
-    }
-
-    .submit-note {
-      margin-top: 16px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.05em;
-    }
-
-    /* ── Footer ── */
-    .site-footer {
-      text-align: center;
-      padding: 48px 0 0;
-      border-top: 1px solid var(--border);
-      margin-top: 48px;
-    }
-
-    .site-footer p {
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      body::before { display: none; }
-    }
-  </style>
+/* footer */
+footer{text-align:center;padding:48px 0 0;border-top:1px solid #242424;margin-top:48px}
+footer p{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#7A7672}
+</style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="page-wrapper">
+<header class="hdr">
+  <div class="rule"><div class="diamond"></div></div>
+  <p class="brand">Daily Grind Media</p>
+  <h1>Podcast Discovery Questionnaire</h1>
+  <p>Please complete this questionnaire prior to your podcast session. The more context and detail you provide, the more strategic and productive we can make your recording session. This information will help shape content pillars, talking points, episode structure, reel opportunities, and future content strategy.</p>
+</header>
 
-  <header class="site-header">
-    <div class="logo-rule"><div class="logo-diamond"></div></div>
-    <h1>Daily Grind Media</h1>
-    <h2>Podcast Discovery Questionnaire</h2>
-    <p>Please complete this questionnaire prior to your podcast session. The more context and detail you provide, the more strategic and productive we can make your recording session. This information will help shape content pillars, talking points, episode structure, reel opportunities, and future content strategy.</p>
-  </header>
+<form action="https://formspree.io/f/mnjygpgr" method="POST">
+<input type="hidden" name="_subject" value="Daily Grind Media Podcast Discovery Submission">
 
-  <form action="https://formspree.io/f/mnjygpgr" method="POST">
+<!-- 01 BUSINESS FOUNDATION -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">01</span><span class="sec-ttl">Business Foundation</span></div>
+  <div class="row">
+    <div class="fg"><label for="full_name">Full Name</label><input type="text" id="full_name" name="full_name" placeholder="Your full name" required></div>
+    <div class="fg"><label for="business_name">Business Name</label><input type="text" id="business_name" name="business_name" placeholder="Your business name"></div>
+  </div>
+  <div class="fg"><label for="email">Email Address</label><input type="email" id="email" name="email" placeholder="your@email.com" required></div>
+  <div class="row">
+    <div class="fg"><label for="website">Website</label><input type="text" id="website" name="website" placeholder="https://"></div>
+    <div class="fg"><label for="instagram">Instagram Handle</label><input type="text" id="instagram" name="instagram" placeholder="@handle"></div>
+  </div>
+  <div class="fg"><label for="services">What services do you offer?</label><textarea id="services" name="services" placeholder="Describe your offerings — training formats, programs, coaching models..."></textarea></div>
+  <div class="fg"><label for="ideal_client">Who is your ideal client?</label><textarea id="ideal_client" name="ideal_client" placeholder="Be specific — demographics, mindset, goals, where they are in their journey..."></textarea></div>
+  <div class="fg"><label for="not_ideal_client">Who is NOT your ideal client?</label><textarea id="not_ideal_client" name="not_ideal_client" placeholder="This helps define your positioning and messaging clearly..."></textarea></div>
+  <div class="fg"><label for="problems_solved">What problems do you solve?</label><textarea id="problems_solved" name="problems_solved" placeholder="The core challenges your clients come to you with..."></textarea></div>
+  <div class="fg"><label for="transformation">What transformation do your clients achieve?</label><textarea id="transformation" name="transformation" placeholder="Describe the outcome — physical, mental, lifestyle..."></textarea></div>
+  <div class="fg"><label for="differentiator">What makes you different from other trainers?</label><textarea id="differentiator" name="differentiator" placeholder="Your unique approach, method, or perspective..."></textarea></div>
+</div>
 
-    <input type="hidden" name="_subject" value="Daily Grind Media Podcast Discovery Submission">
+<!-- 02 YOUR STORY -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">02</span><span class="sec-ttl">Your Story</span></div>
+  <div class="fg"><label for="into_fitness">How did you get into fitness?</label><textarea id="into_fitness" name="into_fitness" placeholder="Your origin story..."></textarea></div>
+  <div class="fg"><label for="inspired_coaching">What inspired you to become a coach?</label><textarea id="inspired_coaching" name="inspired_coaching" placeholder="The moment or journey that led you to coaching..."></textarea></div>
+  <div class="fg"><label for="challenges_overcome">What challenges have you overcome?</label><textarea id="challenges_overcome" name="challenges_overcome" placeholder="Personal or professional — anything that shaped who you are today..."></textarea></div>
+  <div class="fg"><label for="lessons_shaped">What lessons have shaped your coaching philosophy?</label><textarea id="lessons_shaped" name="lessons_shaped" placeholder="Key moments that changed how you think about fitness and coaching..."></textarea></div>
+  <div class="fg"><label for="personal_connections">What personal experiences connect most with clients?</label><textarea id="personal_connections" name="personal_connections" placeholder="Stories clients relate to or that create trust..."></textarea></div>
+</div>
 
-    <!-- 01 Business Foundation -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">01</span>
-        <h2 class="section-title">Business Foundation</h2>
-      </div>
+<!-- 03 COACHING PHILOSOPHY -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">03</span><span class="sec-ttl">Coaching Philosophy</span></div>
+  <div class="fg"><label for="disagree_advice">What fitness advice do you strongly disagree with?</label><textarea id="disagree_advice" name="disagree_advice" placeholder="Conventional wisdom you push back on..."></textarea></div>
+  <div class="fg"><label for="client_mistakes">What mistakes do most clients make?</label><textarea id="client_mistakes" name="client_mistakes" placeholder="The patterns you see repeatedly..."></textarea></div>
+  <div class="fg"><label for="trainer_mistakes">What do most trainers get wrong?</label><textarea id="trainer_mistakes" name="trainer_mistakes" placeholder="Industry-wide gaps or missteps from your perspective..."></textarea></div>
+  <div class="fg"><label for="guiding_beliefs">What beliefs guide your coaching approach?</label><textarea id="guiding_beliefs" name="guiding_beliefs" placeholder="The principles you coach from..."></textarea></div>
+  <div class="fg"><label for="one_lesson">If every client learned one lesson from you, what would it be?</label><textarea id="one_lesson" name="one_lesson" placeholder="Your single most important teaching..."></textarea></div>
+</div>
 
-      <div class="field-row">
-        <div class="field-group">
-          <label for="full_name">Full Name</label>
-          <input type="text" id="full_name" name="full_name" placeholder="Your full name" required>
-        </div>
-        <div class="field-group">
-          <label for="business_name">Business Name</label>
-          <input type="text" id="business_name" name="business_name" placeholder="Your business name">
-        </div>
-      </div>
+<!-- 04 CLIENT SUCCESS STORIES -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">04</span><span class="sec-ttl">Client Success Stories</span></div>
+  <div class="fg"><label for="best_transformation">Describe your best client transformation.</label><textarea class="tall" id="best_transformation" name="best_transformation" placeholder="Share the journey — where they started, what shifted, where they ended up..."></textarea></div>
+  <div class="fg"><label for="standout_challenge">Describe a client challenge that stands out.</label><textarea id="standout_challenge" name="standout_challenge" placeholder="A difficult case and how you navigated it..."></textarea></div>
+  <div class="fg"><label for="success_habits">What habits do successful clients have in common?</label><textarea id="success_habits" name="success_habits" placeholder="The patterns that predict results..."></textarea></div>
+  <div class="fg"><label for="struggle_habits">What habits cause clients to struggle?</label><textarea id="struggle_habits" name="struggle_habits" placeholder="Behaviors that hold people back..."></textarea></div>
+</div>
 
-      <div class="field-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" placeholder="your@email.com" required>
-      </div>
+<!-- 05 EXPERTISE & CONTENT -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">05</span><span class="sec-ttl">Expertise &amp; Content</span></div>
+  <div class="fg"><label for="common_questions">What questions do clients ask you most often?</label><textarea id="common_questions" name="common_questions" placeholder="The FAQs that come up in every consultation..."></textarea></div>
+  <div class="fg"><label for="hour_topics">What topics could you speak about for an hour without preparation?</label><textarea id="hour_topics" name="hour_topics" placeholder="Your zones of deep expertise and passion..."></textarea></div>
+  <div class="fg"><label for="myths">What myths do you frequently debunk?</label><textarea id="myths" name="myths" placeholder="Misconceptions you correct regularly..."></textarea></div>
+  <div class="fg"><label for="passionate_topics">What topics are you most passionate about teaching?</label><textarea id="passionate_topics" name="passionate_topics" placeholder="Where you feel most alive as an educator..."></textarea></div>
+</div>
 
-      <div class="field-row">
-        <div class="field-group">
-          <label for="website">Website</label>
-          <input type="text" id="website" name="website" placeholder="https://">
-        </div>
-        <div class="field-group">
-          <label for="instagram">Instagram Handle</label>
-          <input type="text" id="instagram" name="instagram" placeholder="@handle">
-        </div>
-      </div>
+<!-- 06 PERSONAL BRAND -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">06</span><span class="sec-ttl">Personal Brand</span></div>
+  <div class="fg"><label for="known_for">What do you want to be known for?</label><textarea id="known_for" name="known_for" placeholder="Your reputation — what you want people to say about you..."></textarea></div>
+  <div class="fg"><label for="core_values">What values matter most to you?</label><textarea id="core_values" name="core_values" placeholder="The principles you build your brand around..."></textarea></div>
+  <div class="fg"><label for="motivation">What motivates you?</label><textarea id="motivation" name="motivation" placeholder="What drives you to keep going..."></textarea></div>
+  <div class="fg"><label for="success_definition">What does success mean to you?</label><textarea id="success_definition" name="success_definition" placeholder="How you define it — beyond revenue..."></textarea></div>
+  <div class="fg"><label for="five_year">Where do you want your business to be in 5 years?</label><textarea id="five_year" name="five_year" placeholder="Vision, scale, impact..."></textarea></div>
+</div>
 
-      <div class="field-group">
-        <label for="services">What services do you offer?</label>
-        <textarea id="services" name="services" placeholder="Describe your offerings — training formats, programs, coaching models..."></textarea>
-      </div>
+<!-- 07 PODCAST PLANNING -->
+<div class="sec">
+  <div class="sec-hdr"><span class="sec-num">07</span><span class="sec-ttl">Podcast Planning</span></div>
+  <div class="fg"><label for="podcast_topics">What topics would you like to discuss?</label><textarea id="podcast_topics" name="podcast_topics" placeholder="Themes, angles, or conversations you want to have on air..."></textarea></div>
+  <div class="fg"><label for="stories_to_share">Are there specific stories you want to share?</label><textarea id="stories_to_share" name="stories_to_share" placeholder="Moments, case studies, or narratives you want to tell..."></textarea></div>
+  <div class="fg"><label for="offers_to_highlight">Are there specific offers or services you want to highlight?</label><textarea id="offers_to_highlight" name="offers_to_highlight" placeholder="Current programs, launches, or services to feature..."></textarea></div>
+  <div class="fg"><label for="business_goals">What are your current business goals?</label><textarea id="business_goals" name="business_goals" placeholder="What you're working toward right now — client growth, brand awareness, launches..."></textarea></div>
+  <div class="fg"><label for="anything_else">Anything else you'd like covered?</label><textarea id="anything_else" name="anything_else" placeholder="Open space — add anything that would help us prepare for your session..."></textarea></div>
+</div>
 
-      <div class="field-group">
-        <label for="ideal_client">Who is your ideal client?</label>
-        <textarea id="ideal_client" name="ideal_client" placeholder="Be specific — demographics, mindset, goals, where they are in their journey..."></textarea>
-      </div>
+<!-- SUBMIT -->
+<div class="sub">
+  <button type="submit"><span>Submit Questionnaire &#8594;</span></button>
+  <p class="sub-note">Your responses will be sent securely to the Daily Grind Media team.</p>
+</div>
 
-      <div class="field-group">
-        <label for="not_ideal_client">Who is NOT your ideal client?</label>
-        <textarea id="not_ideal_client" name="not_ideal_client" placeholder="This helps define your positioning and messaging clearly..."></textarea>
-      </div>
+</form>
 
-      <div class="field-group">
-        <label for="problems_solved">What problems do you solve?</label>
-        <textarea id="problems_solved" name="problems_solved" placeholder="The core challenges your clients come to you with..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="transformation">What transformation do your clients achieve?</label>
-        <textarea id="transformation" name="transformation" placeholder="Describe the outcome — physical, mental, lifestyle..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="differentiator">What makes you different from other trainers?</label>
-        <textarea id="differentiator" name="differentiator" placeholder="Your unique approach, method, or perspective..."></textarea>
-      </div>
-    </div>
-
-    <!-- 02 Your Story -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">02</span>
-        <h2 class="section-title">Your Story</h2>
-      </div>
-
-      <div class="field-group">
-        <label for="into_fitness">How did you get into fitness?</label>
-        <textarea id="into_fitness" name="into_fitness" placeholder="Your origin story..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="inspired_coaching">What inspired you to become a coach?</label>
-        <textarea id="inspired_coaching" name="inspired_coaching" placeholder="The moment or journey that led you to coaching..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="challenges_overcome">What challenges have you overcome?</label>
-        <textarea id="challenges_overcome" name="challenges_overcome" placeholder="Personal or professional — anything that shaped who you are today..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="lessons_shaped">What lessons have shaped your coaching philosophy?</label>
-        <textarea id="lessons_shaped" name="lessons_shaped" placeholder="Key moments that changed how you think about fitness and coaching..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="personal_connections">What personal experiences connect most with clients?</label>
-        <textarea id="personal_connections" name="personal_connections" placeholder="Stories clients relate to or that create trust..."></textarea>
-      </div>
-    </div>
-
-    <!-- 03 Coaching Philosophy -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">03</span>
-        <h2 class="section-title">Coaching Philosophy</h2>
-      </div>
-
-      <div class="field-group">
-        <label for="disagree_advice">What fitness advice do you strongly disagree with?</label>
-        <textarea id="disagree_advice" name="disagree_advice" placeholder="Conventional wisdom you push back on..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="client_mistakes">What mistakes do most clients make?</label>
-        <textarea id="client_mistakes" name="client_mistakes" placeholder="The patterns you see repeatedly..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="trainer_mistakes">What do most trainers get wrong?</label>
-        <textarea id="trainer_mistakes" name="trainer_mistakes" placeholder="Industry-wide gaps or missteps from your perspective..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="guiding_beliefs">What beliefs guide your coaching approach?</label>
-        <textarea id="guiding_beliefs" name="guiding_beliefs" placeholder="The principles you coach from..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="one_lesson">If every client learned one lesson from you, what would it be?</label>
-        <textarea id="one_lesson" name="one_lesson" placeholder="Your single most important teaching..."></textarea>
-      </div>
-    </div>
-
-    <!-- 04 Client Success Stories -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">04</span>
-        <h2 class="section-title">Client Success Stories</h2>
-      </div>
-
-      <div class="field-group">
-        <label for="best_transformation">Describe your best client transformation.</label>
-        <textarea class="tall" id="best_transformation" name="best_transformation" placeholder="Share the journey — where they started, what shifted, where they ended up..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="standout_challenge">Describe a client challenge that stands out.</label>
-        <textarea id="standout_challenge" name="standout_challenge" placeholder="A difficult case and how you navigated it..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="success_habits">What habits do successful clients have in common?</label>
-        <textarea id="success_habits" name="success_habits" placeholder="The patterns that predict results..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="struggle_habits">What habits cause clients to struggle?</label>
-        <textarea id="struggle_habits" name="struggle_habits" placeholder="Behaviors that hold people back..."></textarea>
-      </div>
-    </div>
-
-    <!-- 05 Expertise & Content -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">05</span>
-        <h2 class="section-title">Expertise &amp; Content</h2>
-      </div>
-
-      <div class="field-group">
-        <label for="common_questions">What questions do clients ask you most often?</label>
-        <textarea id="common_questions" name="common_questions" placeholder="The FAQs that come up in every consultation..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="hour_topics">What topics could you speak about for an hour without preparation?</label>
-        <textarea id="hour_topics" name="hour_topics" placeholder="Your zones of deep expertise and passion..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="myths">What myths do you frequently debunk?</label>
-        <textarea id="myths" name="myths" placeholder="Misconceptions you correct regularly..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="passionate_topics">What topics are you most passionate about teaching?</label>
-        <textarea id="passionate_topics" name="passionate_topics" placeholder="Where you feel most alive as an educator..."></textarea>
-      </div>
-    </div>
-
-    <!-- 06 Personal Brand -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">06</span>
-        <h2 class="section-title">Personal Brand</h2>
-      </div>
-
-      <div class="field-group">
-        <label for="known_for">What do you want to be known for?</label>
-        <textarea id="known_for" name="known_for" placeholder="Your reputation — what you want people to say about you..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="core_values">What values matter most to you?</label>
-        <textarea id="core_values" name="core_values" placeholder="The principles you build your brand around..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="motivation">What motivates you?</label>
-        <textarea id="motivation" name="motivation" placeholder="What drives you to keep going..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="success_definition">What does success mean to you?</label>
-        <textarea id="success_definition" name="success_definition" placeholder="How you define it — beyond revenue..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="five_year">Where do you want your business to be in 5 years?</label>
-        <textarea id="five_year" name="five_year" placeholder="Vision, scale, impact..."></textarea>
-      </div>
-    </div>
-
-    <!-- 07 Podcast Planning -->
-    <div class="form-section">
-      <div class="section-header">
-        <span class="section-label">07</span>
-        <h2 class="section-title">Podcast Planning</h2>
-      </div>
-
-      <div class="field-group">
-        <label for="podcast_topics">What topics would you like to discuss?</label>
-        <textarea id="podcast_topics" name="podcast_topics" placeholder="Themes, angles, or conversations you want to have on air..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="stories_to_share">Are there specific stories you want to share?</label>
-        <textarea id="stories_to_share" name="stories_to_share" placeholder="Moments, case studies, or narratives you want to tell..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="offers_to_highlight">Are there specific offers or services you want to highlight?</label>
-        <textarea id="offers_to_highlight" name="offers_to_highlight" placeholder="Current programs, launches, or services to feature..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="business_goals">What are your current business goals?</label>
-        <textarea id="business_goals" name="business_goals" placeholder="What you're working toward right now — client growth, brand awareness, launches..."></textarea>
-      </div>
-
-      <div class="field-group">
-        <label for="anything_else">Anything else you'd like covered?</label>
-        <textarea id="anything_else" name="anything_else" placeholder="Open space — add anything that would help us prepare for your session..."></textarea>
-      </div>
-    </div>
-
-    <!-- Submit -->
-    <div class="submit-wrap">
-      <button type="submit"><span>Submit Questionnaire &rarr;</span></button>
-      <p class="submit-note">Your responses will be sent securely to the Daily Grind Media team.</p>
-    </div>
-
-  </form>
-
-  <footer class="site-footer">
-    <p>Daily Grind Media &nbsp;&middot;&nbsp; Confidential</p>
-  </footer>
-
-</div><!-- /page-wrapper -->
-
-<script>
-  // Scroll reveal only — no form JS whatsoever
-  document.querySelectorAll('.form-section').forEach(function(sec) {
-    new IntersectionObserver(function(entries, obs) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.05 }).observe(sec);
-    sec.style.opacity = '0';
-    sec.style.transform = 'translateY(20px)';
-    sec.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-  });
-</script>
-
+<footer><p>Daily Grind Media &nbsp;&middot;&nbsp; Confidential</p></footer>
+</div>
 </body>
 </html>
